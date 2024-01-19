@@ -8275,7 +8275,7 @@ bool X86InstrInfo::unfoldMemoryOperand(
     MachineFunction &MF, MachineInstr &MI, unsigned Reg, bool UnfoldLoad,
     bool UnfoldStore, SmallVectorImpl<MachineInstr *> &NewMIs) const {
   const X86FoldTableEntry *I = lookupUnfoldTable(MI.getOpcode());
-  if (I == nullptr)
+  if (I == nullptr || (I->Flags & TB_BCAST_MASK) == TB_BCAST_SH)
     return false;
   unsigned Opc = I->DstOp;
   unsigned Index = I->Flags & TB_INDEX_MASK;
@@ -8425,7 +8425,7 @@ bool X86InstrInfo::unfoldMemoryOperand(
     return false;
 
   const X86FoldTableEntry *I = lookupUnfoldTable(N->getMachineOpcode());
-  if (I == nullptr)
+  if (I == nullptr || (I->Flags & TB_BCAST_MASK) == TB_BCAST_SH)
     return false;
   unsigned Opc = I->DstOp;
   unsigned Index = I->Flags & TB_INDEX_MASK;
@@ -8559,7 +8559,7 @@ X86InstrInfo::getOpcodeAfterMemoryUnfold(unsigned Opc, bool UnfoldLoad,
                                          bool UnfoldStore,
                                          unsigned *LoadRegIndex) const {
   const X86FoldTableEntry *I = lookupUnfoldTable(Opc);
-  if (I == nullptr)
+  if (I == nullptr || (I->Flags & TB_BCAST_MASK) == TB_BCAST_SH)
     return 0;
   bool FoldedLoad = I->Flags & TB_FOLDED_LOAD;
   bool FoldedStore = I->Flags & TB_FOLDED_STORE;
